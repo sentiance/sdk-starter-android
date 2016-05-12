@@ -1,11 +1,14 @@
 package com.sentiance.sdkstarter;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
@@ -49,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // We need to ask the user to grant permission. We've offloaded that to a different activity for clarity.
+            startActivity(new Intent(this, PermissionCheckActivity.class));
+        }
+
         setContentView(R.layout.activity_main);
 
         statusList = (ListView) findViewById(R.id.statusList);
