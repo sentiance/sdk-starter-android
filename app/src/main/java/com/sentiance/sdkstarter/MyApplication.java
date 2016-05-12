@@ -1,8 +1,11 @@
 package com.sentiance.sdkstarter;
 
 import android.app.Application;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.sentiance.sdk.AuthenticationListener;
@@ -25,6 +28,19 @@ public class MyApplication extends Application {
                 "YOUR_APP_ID",
                 "YOUR_APP_SECRET"
         ));
+
+        // Let the SDK start the service foregrounded by showing a notification. This discourages Android from killing the process.
+        Intent intent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle(getString(R.string.app_name) + " is running")
+                .setContentText("Touch to open.")
+                .setShowWhen(false)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .build();
+        config.enableStartForegrounded(notification);
 
         // Define authentication listener
         AuthenticationListener authenticationListener = new AuthenticationListener() {
