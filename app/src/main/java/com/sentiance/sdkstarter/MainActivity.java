@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshLabels() {
         // On Android, the user id is a resource url, using format https://api.sentiance.com/users/USER_ID, you can replace the part to obtain the short URL code:
-        userIdLabel.setText(Sdk.getInstance(getApplicationContext()).user().getId().get().replace("https://api.sentiance.com/users/", ""));
+        if(Sdk.getInstance(getApplicationContext()).user().getId().isPresent()) {
+            userIdLabel.setText(Sdk.getInstance(getApplicationContext()).user().getId().get().replace("https://api.sentiance.com/users/", ""));
+        }
 
         // You can use the status message to obtain more information
         StatusMessage statusMessage = Sdk.getInstance(getApplicationContext()).getStatusMessage();
