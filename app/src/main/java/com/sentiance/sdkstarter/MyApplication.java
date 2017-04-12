@@ -8,13 +8,23 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.sentiance.sdk.AuthenticationListener;
-import com.sentiance.sdk.Sdk;
-import com.sentiance.sdk.modules.config.SdkConfig;
+import com.sentiance.sdk.OnInitCallback;
+import com.sentiance.sdk.OnSdkStatusUpdateHandler;
+import com.sentiance.sdk.OnStartFinishedHandler;
+import com.sentiance.sdk.SdkConfig;
+import com.sentiance.sdk.SdkStatus;
+import com.sentiance.sdk.Sentiance;
+import com.sentiance.sdk.Token;
+import com.sentiance.sdk.TokenResultCallback;
 
-public class MyApplication extends Application {
-    public static final String ACTION_SDK_AUTHENTICATION_SUCCESS = "ACTION_SDK_AUTHENTICATION_SUCCESS";
+public class MyApplication extends Application implements OnInitCallback, OnSdkStatusUpdateHandler, OnStartFinishedHandler {
 
+    public static final String ACTION_SENTIANCE_STATUS_UPDATE = "ACTION_SENTIANCE_STATUS_UPDATE";
+
+    private static final String SENTIANCE_APP_ID = "YOUR_APP_ID";
+    private static final String SENTIANCE_SECRET = "YOUR_SECRET";
+
+    private static final String TAG = "SDKStarter";
 
     @Override
     public void onCreate() {
@@ -23,13 +33,8 @@ public class MyApplication extends Application {
     }
 
     private void initializeSentianceSdk() {
-        // SDK configuration
-        SdkConfig config = new SdkConfig(new SdkConfig.AppCredentials(
-                "YOUR_APP_ID",
-                "YOUR_APP_SECRET"
-        ));
-
-        // Let the SDK start the service foregrounded by showing a notification. This discourages Android from killing the process.
+        // Create a notification that will be used by the Sentiance SDK to start the service foregrounded.
+        // This discourages Android from killing the process.
         Intent intent = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         Notification notification = new NotificationCompat.Builder(this)
@@ -40,42 +45,70 @@ public class MyApplication extends Application {
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .build();
-        config.enableStartForegrounded(notification);
 
-        // Define authentication listener
-        AuthenticationListener authenticationListener = new AuthenticationListener() {
+        // Create the config.
+        SdkConfig config = new SdkConfig.Builder(SENTIANCE_APP_ID, SENTIANCE_SECRET)
+                .enableForeground(notification)
+                .setOnSdkStatusUpdateHandler(this)
+                .build();
+
+        // Initialize the Sentiance SDK.
+        Sentiance.getInstance(this).init(config, this);
+    }
+
+    @Override
+    public void onInitSuccess() {
+        printInitSuccessLogStatements();
+
+        // Sentiance SDK was successfully initialized, we can now start it.
+        Sentiance.getInstance(this).start(this);
+    }
+
+    @Override
+    public void onInitFailure(InitIssue initIssue) {
+        Log.e(TAG, "Could not initialize SDK: " + initIssue);
+
+        switch (initIssue) {
+            case INVALID_CREDENTIALS:
+                Log.e(TAG, "Make sure SENTIANCE_APP_ID and SENTIANCE_SECRET are set correctly.");
+                break;
+            case CHANGED_CREDENTIALS:
+                Log.e(TAG, "The app ID and secret have changed; this is not supported. If you meant to change the app credentials, please uninstall the app and try again.");
+                break;
+            case SERVICE_UNREACHABLE:
+                Log.e(TAG, "The Sentiance API could not be reached. Double-check your internet connection and try again.");
+                break;
+        }
+    }
+
+    @Override
+    public void onStartFinished(SdkStatus sdkStatus) {
+        Log.i(TAG, "SDK start finished with status: " + sdkStatus.startStatus);
+    }
+
+    @Override
+    public void onSdkStatusUpdate(SdkStatus sdkStatus) {
+        Log.i(TAG, "SDK status updated: " + sdkStatus.toString());
+
+        // The status update is broadcast internally; this is so the other components of the app
+        // (specifically MainActivity) can react on this.
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_SENTIANCE_STATUS_UPDATE));
+    }
+
+    private void printInitSuccessLogStatements() {
+        Log.i(TAG, "Sentiance SDK initialized, version: " + Sentiance.getInstance(this).getVersion());
+        Log.i(TAG, "Sentiance platform user id for this install: " + Sentiance.getInstance(this).getUserId());
+        Sentiance.getInstance(this).getUserAccessToken(new TokenResultCallback() {
             @Override
-            public void onAuthenticationSucceeded() {
-                // Called when the SDK was able to create a platform user
-                Log.i("SDKStarter", "Sentiance SDK started, version: "+Sdk.getInstance(getApplicationContext()).getVersion());
-                Log.i("SDKStarter", "Sentiance platform user id for this install: "+Sdk.getInstance(getApplicationContext()).user().getId().get());
-                Log.i("SDKStarter", "Authorization token that can be used to query the HTTP API: Bearer "+Sdk.getInstance(getApplicationContext()).user().getAccessToken());
-
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SDK_AUTHENTICATION_SUCCESS));
+            public void onSuccess(Token token) {
+                Log.i(TAG, "Access token to query the HTTP API: Bearer " + token.getTokenId());
+                // Using this token, you can query the Sentiance API.
             }
 
             @Override
-            // Called when the SDK could not create a platform user
-            public void onAuthenticationFailed(String s) {
-                // Here you should wait, inform the user to ensure an internet connection and retry initializeSentianceSdk afterwards
-                Log.e("SDKStarter", "Error launching Sentiance SDK: "+s);
-
-
-
-                // Some SDK Starter specific help
-                if(s.contains("Bad Request")) {
-                    Log.e("SDKStarter", "You should create a developer account on https://audience.sentiance.com/developers and afterwards register a Sentiance application on https://audience.sentiance.com/apps\n" +
-                            "This will give you an application ID and secret which you can use to replace YOUR_APP_ID and YOUR_APP_SECRET in AppDelegate.m");
-                }
+            public void onFailure() {
+                Log.e(TAG, "Couldn't get access token");
             }
-        };
-
-        // Register this instance as authentication listener
-        Sdk.getInstance(this).setAuthenticationListener(authenticationListener);
-
-        // Initialize and start the Sentiance SDK module
-        // The first time an app installs on a device, the SDK requires internet to create a Sentiance platform userid
-        Sdk.getInstance(this).init(config);
+        });
     }
 }
-
