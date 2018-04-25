@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final BroadcastReceiver statusUpdateReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive (Context context, Intent intent) {
             refreshStatus();
         }
     };
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView statusList;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -43,11 +43,11 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        statusList = (ListView) findViewById(R.id.statusList);
+        statusList = (ListView)findViewById(R.id.statusList);
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume () {
         super.onResume();
 
         // Register a receiver so we are notified by MyApplication when the Sentiance SDK status was updated.
@@ -57,13 +57,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause () {
         super.onPause();
 
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(statusUpdateReceiver);
     }
 
-    private void refreshStatus() {
+    private void refreshStatus () {
         List<String> statusItems = new ArrayList<>();
 
         if (Sentiance.getInstance(this).isInitialized()) {
@@ -81,14 +81,15 @@ public class MainActivity extends AppCompatActivity {
             statusItems.add(formatQuota("Wi-Fi", sdkStatus.wifiQuotaStatus, Sentiance.getInstance(this).getWiFiQuotaUsage(), Sentiance.getInstance(this).getWiFiQuotaLimit()));
             statusItems.add(formatQuota("Mobile data", sdkStatus.mobileQuotaStatus, Sentiance.getInstance(this).getMobileQuotaUsage(), Sentiance.getInstance(this).getMobileQuotaLimit()));
             statusItems.add(formatQuota("Disk", sdkStatus.diskQuotaStatus, Sentiance.getInstance(this).getDiskQuotaUsage(), Sentiance.getInstance(this).getDiskQuotaLimit()));
-        } else {
+        }
+        else {
             statusItems.add("SDK not initialized");
         }
 
         statusList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item_status, R.id.textView, statusItems));
     }
 
-    private String formatQuota(String name, SdkStatus.QuotaStatus status, long bytesUsed, long bytesLimit) {
+    private String formatQuota (String name, SdkStatus.QuotaStatus status, long bytesUsed, long bytesLimit) {
         return String.format(Locale.US, "%s quota: %s / %s (%s)",
                 name,
                 Formatter.formatShortFileSize(this, bytesUsed),
