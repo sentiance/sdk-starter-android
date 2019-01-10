@@ -8,11 +8,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.sentiance.sdk.OnInitCallback;
-import com.sentiance.sdk.OnSdkStatusUpdateHandler;
 import com.sentiance.sdk.OnStartFinishedHandler;
 import com.sentiance.sdk.SdkConfig;
 import com.sentiance.sdk.SdkStatus;
@@ -20,9 +18,7 @@ import com.sentiance.sdk.Sentiance;
 import com.sentiance.sdk.Token;
 import com.sentiance.sdk.TokenResultCallback;
 
-public class MyApplication extends Application implements OnInitCallback, OnSdkStatusUpdateHandler, OnStartFinishedHandler {
-
-    public static final String ACTION_SENTIANCE_STATUS_UPDATE = "ACTION_SENTIANCE_STATUS_UPDATE";
+public class MyApplication extends Application implements OnInitCallback, OnStartFinishedHandler {
 
     private static final String SENTIANCE_APP_ID = "YOUR_APP_ID";
     private static final String SENTIANCE_SECRET = "YOUR_APP_SECRET";
@@ -38,7 +34,7 @@ public class MyApplication extends Application implements OnInitCallback, OnSdkS
     private void initializeSentianceSdk () {
         // Create the config.
         SdkConfig config = new SdkConfig.Builder(SENTIANCE_APP_ID, SENTIANCE_SECRET, createNotification())
-                .setOnSdkStatusUpdateHandler(this)
+                .setOnSdkStatusUpdateHandler(new SdkStatusUpdateHandler(getApplicationContext()))
                 .build();
 
         // Initialize the Sentiance SDK.
@@ -73,15 +69,6 @@ public class MyApplication extends Application implements OnInitCallback, OnSdkS
     @Override
     public void onStartFinished (SdkStatus sdkStatus) {
         Log.i(TAG, "SDK start finished with status: " + sdkStatus.startStatus);
-    }
-
-    @Override
-    public void onSdkStatusUpdate (SdkStatus sdkStatus) {
-        Log.i(TAG, "SDK status updated: " + sdkStatus.toString());
-
-        // The status update is broadcast internally; this is so the other components of the app
-        // (specifically MainActivity) can react on this.
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_SENTIANCE_STATUS_UPDATE));
     }
 
     private Notification createNotification () {

@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         // Register a receiver so we are notified by MyApplication when the Sentiance SDK status was updated.
-        LocalBroadcastManager.getInstance(this).registerReceiver(statusUpdateReceiver, new IntentFilter(MyApplication.ACTION_SENTIANCE_STATUS_UPDATE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(statusUpdateReceiver, new IntentFilter(SdkStatusUpdateHandler.ACTION_SENTIANCE_STATUS_UPDATE));
 
         refreshStatus();
     }
