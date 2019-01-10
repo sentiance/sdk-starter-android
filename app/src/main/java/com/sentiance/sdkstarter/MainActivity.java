@@ -14,6 +14,7 @@ import android.text.format.Formatter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.sentiance.sdk.InitState;
 import com.sentiance.sdk.SdkStatus;
 import com.sentiance.sdk.Sentiance;
 
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private void refreshStatus () {
         List<String> statusItems = new ArrayList<>();
 
-        if (Sentiance.getInstance(this).isInitialized()) {
+        if (Sentiance.getInstance(this).getInitState() == InitState.INITIALIZED) {
             statusItems.add("SDK version: " + Sentiance.getInstance(this).getVersion());
             statusItems.add("User ID: " + Sentiance.getInstance(this).getUserId());
 
