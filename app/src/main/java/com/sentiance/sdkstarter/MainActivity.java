@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -82,6 +83,16 @@ public class MainActivity extends AppCompatActivity {
             statusItems.add(formatQuota("Wi-Fi", sdkStatus.wifiQuotaStatus, Sentiance.getInstance(this).getWiFiQuotaUsage(), Sentiance.getInstance(this).getWiFiQuotaLimit()));
             statusItems.add(formatQuota("Mobile data", sdkStatus.mobileQuotaStatus, Sentiance.getInstance(this).getMobileQuotaUsage(), Sentiance.getInstance(this).getMobileQuotaLimit()));
             statusItems.add(formatQuota("Disk", sdkStatus.diskQuotaStatus, Sentiance.getInstance(this).getDiskQuotaUsage(), Sentiance.getInstance(this).getDiskQuotaLimit()));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                statusItems.add("Battery optimization enabled: " + String.valueOf(sdkStatus.isBatteryOptimizationEnabled));
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                statusItems.add("Battery saving enabled: " + String.valueOf(sdkStatus.isBatterySavingEnabled));
+            }
+            if (Build.VERSION.SDK_INT >= 28) {
+                statusItems.add("Background processing restricted: " + String.valueOf(sdkStatus.isBackgroundProcessingRestricted));
+            }
         }
         else {
             statusItems.add("SDK not initialized");
