@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -50,7 +51,7 @@ public class MyApplication extends Application implements OnInitCallback, OnStar
     }
 
     @Override
-    public void onInitFailure (InitIssue initIssue) {
+    public void onInitFailure (InitIssue initIssue, @Nullable Throwable throwable) {
         Log.e(TAG, "Could not initialize SDK: " + initIssue);
 
         switch (initIssue) {
@@ -62,6 +63,12 @@ public class MyApplication extends Application implements OnInitCallback, OnStar
                 break;
             case SERVICE_UNREACHABLE:
                 Log.e(TAG, "The Sentiance API could not be reached. Double-check your internet connection and try again.");
+                break;
+            case LINK_FAILED:
+                Log.e(TAG, "An issue was encountered trying to link the installation ID to the metauser.");
+                break;
+            case INITIALIZATION_ERROR:
+                Log.e(TAG, "An unexpected exception or an error occurred during initialization.", throwable);
                 break;
         }
     }
