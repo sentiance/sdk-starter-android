@@ -7,9 +7,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import com.sentiance.sdk.OnInitCallback;
 import com.sentiance.sdk.OnStartFinishedHandler;
@@ -21,8 +22,8 @@ import com.sentiance.sdk.TokenResultCallback;
 
 public class MyApplication extends Application implements OnInitCallback, OnStartFinishedHandler {
 
-    private static final String SENTIANCE_APP_ID = "YOUR_APP_ID";
-    private static final String SENTIANCE_SECRET = "YOUR_APP_SECRET";
+    private static final String SENTIANCE_APP_ID = "5d7676a02d44e60600000011";
+    private static final String SENTIANCE_SECRET = "1e3919f4775c236800b61621fab4d2e5ba789fbadc5a2496482f1adbab09e67b15eb89df8a34812d0169a88b1158a660d4c5bd58026cdb1860c39bf49c54394e";
 
     private static final String TAG = "SDKStarter";
 
@@ -36,6 +37,7 @@ public class MyApplication extends Application implements OnInitCallback, OnStar
         // Create the config.
         SdkConfig config = new SdkConfig.Builder(SENTIANCE_APP_ID, SENTIANCE_SECRET, createNotification())
                 .setOnSdkStatusUpdateHandler(new SdkStatusUpdateHandler(getApplicationContext()))
+                .baseURL("https://preprod-api.sentiance.com/")
                 .build();
 
         // Initialize the Sentiance SDK.

@@ -2,8 +2,10 @@ package com.sentiance.sdkstarter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.sentiance.sdk.OnSdkStatusUpdateHandler;
 import com.sentiance.sdk.SdkStatus;
