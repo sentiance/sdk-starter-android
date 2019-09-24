@@ -1,19 +1,17 @@
 package com.sentiance.sdkstarter;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.format.Formatter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.sentiance.sdk.InitState;
 import com.sentiance.sdk.SdkStatus;
@@ -38,14 +36,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // We need to ask the user to grant permission. We've offloaded that to a different activity for clarity.
+        if (new PermissionManager(this).getNotGrantedPermissions().size() > 0) {
             startActivity(new Intent(this, PermissionCheckActivity.class));
         }
 
         setContentView(R.layout.activity_main);
 
-        statusList = (ListView)findViewById(R.id.statusList);
+        statusList = findViewById(R.id.statusList);
     }
 
     @Override
@@ -75,9 +72,10 @@ public class MainActivity extends AppCompatActivity {
             SdkStatus sdkStatus = Sentiance.getInstance(this).getSdkStatus();
 
             statusItems.add("Start status: " + sdkStatus.startStatus.name());
-            statusItems.add("Can detect: " + String.valueOf(sdkStatus.canDetect));
-            statusItems.add("Remote enabled: " + String.valueOf(sdkStatus.isRemoteEnabled));
-            statusItems.add("Location perm granted: " + String.valueOf(sdkStatus.isLocationPermGranted));
+            statusItems.add("Can detect: " + sdkStatus.canDetect);
+            statusItems.add("Remote enabled: " + sdkStatus.isRemoteEnabled);
+            statusItems.add("Activity perm granted: " + sdkStatus.isActivityRecognitionPermGranted);
+            statusItems.add("Location perm granted: " + sdkStatus.isLocationPermGranted);
             statusItems.add("Location setting: " + sdkStatus.locationSetting.name());
 
             statusItems.add(formatQuota("Wi-Fi", sdkStatus.wifiQuotaStatus, Sentiance.getInstance(this).getWiFiQuotaUsage(), Sentiance.getInstance(this).getWiFiQuotaLimit()));
@@ -85,13 +83,13 @@ public class MainActivity extends AppCompatActivity {
             statusItems.add(formatQuota("Disk", sdkStatus.diskQuotaStatus, Sentiance.getInstance(this).getDiskQuotaUsage(), Sentiance.getInstance(this).getDiskQuotaLimit()));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                statusItems.add("Battery optimization enabled: " + String.valueOf(sdkStatus.isBatteryOptimizationEnabled));
+                statusItems.add("Battery optimization enabled: " + sdkStatus.isBatteryOptimizationEnabled);
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                statusItems.add("Battery saving enabled: " + String.valueOf(sdkStatus.isBatterySavingEnabled));
+                statusItems.add("Battery saving enabled: " + sdkStatus.isBatterySavingEnabled);
             }
             if (Build.VERSION.SDK_INT >= 28) {
-                statusItems.add("Background processing restricted: " + String.valueOf(sdkStatus.isBackgroundProcessingRestricted));
+                statusItems.add("Background processing restricted: " + sdkStatus.isBackgroundProcessingRestricted);
             }
         }
         else {

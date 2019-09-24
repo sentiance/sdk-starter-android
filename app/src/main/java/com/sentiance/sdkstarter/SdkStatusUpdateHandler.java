@@ -2,8 +2,10 @@ package com.sentiance.sdkstarter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.sentiance.sdk.OnSdkStatusUpdateHandler;
 import com.sentiance.sdk.SdkStatus;
@@ -85,7 +87,7 @@ public class SdkStatusUpdateHandler implements OnSdkStatusUpdateHandler {
         if (!status.isLocationPermGranted) {
             Log.i(TAG, "Location permission has not been granted.");
 
-            // Ask the user to grant location permission.
+            // Ask the user to grant the location permission.
         }
 
         if (status.locationSetting == SdkStatus.LocationSetting.DISABLED) {
@@ -94,6 +96,12 @@ public class SdkStatusUpdateHandler implements OnSdkStatusUpdateHandler {
             // Ask the user to set the location mode to high accuracy (enabling
             // both GPS and network location providers).
             // See: https://developers.google.com/android/reference/com/google/android/gms/location/SettingsClient
+        }
+
+        if (!status.isActivityRecognitionPermGranted) {
+            Log.i(TAG, "Activity recognition permission has not been granted.");
+
+            // Ask the user to grant the activity recognition permission.
         }
 
         if (!status.isLocationAvailable) {
