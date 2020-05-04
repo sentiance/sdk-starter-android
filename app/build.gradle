@@ -25,7 +25,7 @@ dependencies {
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
 
     // Include the latest version of the Sentiance SDK.
-    // For the latest version, check https://developers.sentiance.com/docs/sdk/android/integration
+    // For the latest version, check https://docs.sentiance.com/sdk/changelog/android
     implementation ('com.sentiance:sdk:4.14.0@aar') {
         transitive = true
         exclude group: 'com.android.support'
