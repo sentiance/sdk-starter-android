@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -19,16 +20,24 @@ import com.sentiance.sdk.SdkStatus;
 import com.sentiance.sdk.Sentiance;
 import com.sentiance.sdk.Token;
 import com.sentiance.sdk.TokenResultCallback;
+import com.sentiance.sdk.crashdetection.CrashCallback;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class MyApplication extends Application implements OnInitCallback, OnStartFinishedHandler {
 
+    private static final String TAG = "SDKStarter";
     private static final String SENTIANCE_APP_ID = "YOUR_APP_ID";
     private static final String SENTIANCE_SECRET = "YOUR_APP_SECRET";
 
-    private static final String TAG = "SDKStarter";
+    private SimpleDateFormat dateFormatter;
 
     @Override
     public void onCreate () {
+        dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.ENGLISH);
+
         super.onCreate();
         initializeSentianceSdk();
     }
@@ -46,6 +55,8 @@ public class MyApplication extends Application implements OnInitCallback, OnStar
     @Override
     public void onInitSuccess () {
         printInitSuccessLogStatements();
+
+        listenForVehicleCrashes();
 
         // Sentiance SDK was successfully initialized, we can now start it.
         Sentiance.getInstance(this).start(this);
@@ -118,5 +129,29 @@ public class MyApplication extends Application implements OnInitCallback, OnStar
                 Log.e(TAG, "Couldn't get access token");
             }
         });
+    }
+
+    private void listenForVehicleCrashes() {
+        Sentiance.getInstance(this).setCrashCallback(new CrashCallback() {
+            @Override
+            public void onCrash(long time, @Nullable Location lastKnownLocation) {
+                Log.i(TAG, "A vehicle crash was detected on " + getFormattedDate(time) + " at location " +
+                    getFormattedLocation(lastKnownLocation));
+            }
+        });
+    }
+
+    private String getFormattedDate(long epochTime) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(epochTime);
+        return dateFormatter.format(calendar.getTime());
+    }
+
+    private String getFormattedLocation(@Nullable Location location) {
+        if (location == null) {
+            return "[unknown]";
+        } else {
+            return String.format(Locale.ENGLISH, "[%.4f, %.4f]", location.getLatitude(), location.getLongitude());
+        }
     }
 }
