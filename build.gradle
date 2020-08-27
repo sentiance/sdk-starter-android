@@ -19,7 +19,7 @@ allprojects {
 
         // Add the Sentiance repository
         maven {
-            url "http://repository.sentiance.com"
+            url "https://repository.sentiance.com"
         }
        google()
     }

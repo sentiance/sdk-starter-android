@@ -54,21 +54,11 @@ public class SdkStatusUpdateHandler implements OnSdkStatusUpdateHandler {
             // If possible, ask the user to disable battery saving.
         }
 
-        if (status.isBackgroundProcessingRestricted) {
-            Log.i(TAG, "Background processing is restricted");
-
-            // On Android 9 and above, this restriction prevents an app from running
-            // in the background, impacting SDK detections.
-
-            // Ask the user to remove this restriction.
-            // See: https://developers.sentiance.com/docs/sdk/android/status
-        }
-
         if (status.isBatteryOptimizationEnabled) {
             Log.i(TAG, "OS battery optimization is enabled");
 
             // This may cause detection issues on some devices.
-            // See: https://developers.sentiance.com/docs/sdk/android/integration
+            // See: https://docs.sentiance.com/sdk/appendix/android/android-battery-optimization
         }
 
         if (!status.isAccelPresent) {
@@ -117,6 +107,16 @@ public class SdkStatusUpdateHandler implements OnSdkStatusUpdateHandler {
             // Ask the user to disable airplane mode if possible.
         }
 
+        if (status.isBackgroundProcessingRestricted) {
+            Log.i(TAG, "Background processing is restricted");
+
+            // On Android 9 and above, this restriction prevents an app from running
+            // in the background, disabling SDK detections.
+
+            // Ask the user to remove this restriction.
+            // See: https://docs.sentiance.com/sdk/api-reference/android/sdkstatus
+        }
+        
         if (status.diskQuotaStatus == SdkStatus.QuotaStatus.EXCEEDED) {
             Log.i(TAG, "Disk quota exceeded");
 
