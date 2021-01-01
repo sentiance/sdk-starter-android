@@ -6,6 +6,10 @@ import android.content.SharedPreferences;
 
 import androidx.core.app.ActivityCompat;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Permission {
     private static final String KEY_CAN_SHOW_AGAIN = "can_show_again";
     private static final String KEY_SHOW_RATIONALE = "show_rationale";
@@ -15,14 +19,20 @@ public class Permission {
     private final int askCode;
     private final String dialogTitle;
     private final String dialogMessage;
+    private final List<Permission> dependantPermissions;
+
+    Permission (String name, String[] manifestPermissions, int askCode, String dialogTitle, String dialogMessage) {
+        this(name, manifestPermissions, askCode, dialogTitle, dialogMessage, Collections.<Permission>emptyList());
+    }
 
     Permission (String name, String[] manifestPermissions, int askCode,
-                String dialogTitle, String dialogMessage) {
+                String dialogTitle, String dialogMessage, List<Permission> dependantPermissions) {
         this.name = name;
         this.manifestPermissions = manifestPermissions;
         this.askCode = askCode;
         this.dialogTitle = dialogTitle;
         this.dialogMessage = dialogMessage;
+        this.dependantPermissions = new ArrayList<>(dependantPermissions);
     }
 
     boolean isGranted (Activity activity) {
@@ -58,6 +68,10 @@ public class Permission {
 
     String getDialogMessage () {
         return dialogMessage;
+    }
+
+    public List<Permission> getDependencies() {
+        return dependantPermissions;
     }
 
     @Override
