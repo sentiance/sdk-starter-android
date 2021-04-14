@@ -20,13 +20,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.12'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
 
     // Include the latest version of the Sentiance SDK.
     // For the latest version, check https://docs.sentiance.com/sdk/changelog/android
-    implementation ('com.sentiance:sdk:4.14.0@aar') {
+    implementation ('com.sentiance:sdk:4.19.0@aar') {
         transitive = true
         exclude group: 'com.android.support'
     }

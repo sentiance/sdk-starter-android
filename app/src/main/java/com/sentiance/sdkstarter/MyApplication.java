@@ -20,7 +20,8 @@ import com.sentiance.sdk.SdkStatus;
 import com.sentiance.sdk.Sentiance;
 import com.sentiance.sdk.Token;
 import com.sentiance.sdk.TokenResultCallback;
-import com.sentiance.sdk.crashdetection.CrashCallback;
+import com.sentiance.sdk.ondevicefull.crashdetection.VehicleCrashEvent;
+import com.sentiance.sdk.ondevicefull.crashdetection.VehicleCrashListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -82,6 +83,9 @@ public class MyApplication extends Application implements OnInitCallback, OnStar
             case INITIALIZATION_ERROR:
                 Log.e(TAG, "An unexpected exception or an error occurred during initialization.", throwable);
                 break;
+            case SDK_RESET_IN_PROGRESS:
+                Log.e(TAG, "SDK reset operation is in progress. Wait until it's complete.", throwable);
+                break;
         }
     }
 
@@ -132,11 +136,11 @@ public class MyApplication extends Application implements OnInitCallback, OnStar
     }
 
     private void listenForVehicleCrashes() {
-        Sentiance.getInstance(this).setCrashCallback(new CrashCallback() {
+        Sentiance.getInstance(this).setVehicleCrashListener(new VehicleCrashListener() {
             @Override
-            public void onCrash(long time, @Nullable Location lastKnownLocation) {
-                Log.i(TAG, "A vehicle crash was detected on " + getFormattedDate(time) + " at location " +
-                    getFormattedLocation(lastKnownLocation));
+            public void onVehicleCrash(VehicleCrashEvent event) {
+                Log.i(TAG, "A vehicle crash was detected on " + getFormattedDate(event.getTime()) + " at location " +
+                    getFormattedLocation(event.getLocation()));
             }
         });
     }
