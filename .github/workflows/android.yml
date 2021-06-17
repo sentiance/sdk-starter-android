@@ -54,10 +54,10 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-      - name: Build APK
-        run: ./gradlew assembleDebug --stacktrace
-      - name: Upload APK
-        uses: actions/upload-artifact@v2
-        with:
-          name: apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+    - name: Build APK
+      run: ./gradlew assembleDebug --stacktrace
+    - name: Upload APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: apk
+        path: app/build/outputs/apk/debug/app-debug.apk
