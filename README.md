@@ -1,5 +1,7 @@
-# Sentiance SDK Starter
+# DEPRECATED
+Refer to [sample-apps-android](https://github.com/sentiance/sample-apps-android).
 
+#
 A simple single-view application that uses the Sentiance SDK.
    
 Steps applied: [Sentiance Android SDK docs](https://docs.sentiance.com/sdk/getting-started/android-sdk)
